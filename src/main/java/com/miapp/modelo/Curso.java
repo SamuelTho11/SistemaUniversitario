@@ -9,5 +9,6 @@ package com.miapp.modelo;
  * @author Samuel
  */
 public class Curso {
-    
+    private int codigo;
+    private int creditos;
 }

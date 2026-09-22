@@ -11,16 +11,13 @@ public final class Estudiante extends Persona {
     public static final String CARRERA_PREDETERMINADA = "Sin especificar";
 
     // ── Atributos de instancia ────────────────────────────────────────────────
-    private int    id;
     private String carrera;
     private double promedio;
 
     // ── Constructor ───────────────────────────────────────────────────────────
 
-    public Estudiante(int id, String nombre, String apellido, String carrera, double promedio) {
-        this.id       = id;
-        this.nombre   = nombre;
-        this.apellido = apellido;
+    public Estudiante(String carrera, double promedio, String nombre, String apellido, int id) {
+        super(nombre, apellido, id);
         this.carrera  = carrera;
    
         if (promedio >= PROMEDIO_MINIMO && promedio <= PROMEDIO_MAXIMO) {
@@ -54,14 +51,6 @@ public final class Estudiante extends Persona {
         return id; 
     }
 
-    public String getNombre() { 
-        return nombre; 
-    }
-
-    public String getApellido() {
-        return apellido;
-    }
-
     public String getCarrera() { 
         return carrera; 
     }
@@ -74,14 +63,6 @@ public final class Estudiante extends Persona {
 
     public void setId(int id) { 
         this.id = id; 
-    }
-
-    public void setNombre(String nombre) { 
-        this.nombre = nombre; 
-    }
-
-    public void setApellido(String apellido) { 
-        this.apellido = apellido; 
     }
 
     public void setCarrera(String carrera) { 
@@ -98,16 +79,12 @@ public final class Estudiante extends Persona {
             this.promedio = p;
         }
     }
-
     /**
      Método final: no puede ser sobrescrito por subclases
      */
+    
     @Override
-    public final String toString() {
-        return "ID: " + id
-             + " | Nombre: " + nombre
-             + " | Apellido: " + apellido   
-             + " | Carrera: " + carrera
-             + " | Promedio: " + String.format("%.2f", promedio);
+    public String toString() {
+        return "Estudiante{" + "carrera=" + carrera + ", promedio=" + promedio + '}';
     }
 }
