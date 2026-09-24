@@ -1,6 +1,8 @@
 package com.miapp.controlador;
 
 import com.miapp.modelo.Estudiante;
+import com.miapp.modelo.Curso;
+import com.miapp.modelo.Profesor;
 import com.miapp.servicios.IBuscador;
 import com.miapp.vista.EstudianteView;
 
@@ -210,4 +212,9 @@ public class EstudianteController implements IBuscador {
 
         return true;
     }
+
+    @Override
+    public void inscribible() {
+    }
+    
 }

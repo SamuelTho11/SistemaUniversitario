@@ -1,5 +1,7 @@
 package com.miapp.modelo;
 
+import java.util.List;
+
 /**
  * Modelo: representa la entidad Estudiante.
  */
@@ -9,14 +11,16 @@ public final class Estudiante extends Persona {
     public static final int PROMEDIO_MINIMO = 0;
     public static final int PROMEDIO_MAXIMO = 5;
     public static final String CARRERA_PREDETERMINADA = "Sin especificar";
+    public static final int MAX_MATERIAS = 12;
 
     // ── Atributos de instancia ────────────────────────────────────────────────
     private String carrera;
     private double promedio;
+    private List<Curso> cursos;
 
     // ── Constructor ───────────────────────────────────────────────────────────
 
-    public Estudiante(String carrera, double promedio, String nombre, String apellido, int id) {
+    public Estudiante(int id, String nombre, String apellido, String carrera, double promedio) {
         super(nombre, apellido, id);
         this.carrera  = carrera;
    
@@ -81,10 +85,15 @@ public final class Estudiante extends Persona {
     }
     /**
      Método final: no puede ser sobrescrito por subclases
+     * @return 
      */
-    
     @Override
     public String toString() {
-        return "Estudiante{" + "carrera=" + carrera + ", promedio=" + promedio + '}';
+        return super.personaToString() + "carrera=" + carrera + ", promedio=" + promedio + '}';
+    }
+
+    @Override
+    public double calcularPago() {
+        return 0;
     }
 }

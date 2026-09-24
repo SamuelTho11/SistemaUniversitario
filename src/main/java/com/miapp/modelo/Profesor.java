@@ -9,7 +9,7 @@ package com.miapp.modelo;
  * @author Samuel
  */
 public class Profesor extends Persona {
-    private  final double salarioBase;
+    private final double salarioBase;
 
     public Profesor(double salarioBase, String nombre, String apellido, int id) {
         super(nombre, apellido, id);
@@ -18,5 +18,10 @@ public class Profesor extends Persona {
     
     public void impartirClase(){
         
+    }
+
+    @Override
+    public double calcularPago() {
+        return salarioBase;
     }
 }

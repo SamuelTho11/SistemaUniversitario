@@ -43,11 +43,10 @@ public abstract class Persona {
         this.id = id;
     }
     
-    public void calcularPago(){
-        
-    }
+    public abstract double calcularPago();
 
-    public String toString() {
-        return "Persona{" + "nombre=" + nombre + ", apellido=" + apellido + ", id=" + id + '}';
+    public String personaToString
+        () {
+        return "Persona{" + "nombre=" + nombre + ", apellido=" + apellido + ", id=" + id;
     }
 }
