@@ -4,6 +4,8 @@
  */
 package com.miapp.modelo;
 
+import com.miapp.servicios.IBuscador;
+
 /**
  *
  * @author Samuel
@@ -22,6 +24,8 @@ public class Profesor extends Persona {
 
     @Override
     public double calcularPago() {
+        //salario base por las horas
         return salarioBase;
     }
+
 }

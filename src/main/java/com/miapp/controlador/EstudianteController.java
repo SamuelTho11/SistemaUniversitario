@@ -23,6 +23,8 @@ public class EstudianteController implements IBuscador {
 
     // ── Array de estudiantes (fuente de datos) ────────────────────────────────
     private Estudiante[] estudiantes;
+    private List<Profesor> profesores;
+    private List<Curso> cursos;
 
     // ── Constructor ───────────────────────────────────────────────────────────
 
@@ -213,8 +215,4 @@ public class EstudianteController implements IBuscador {
         return true;
     }
 
-    @Override
-    public void inscribible() {
-    }
-    
 }

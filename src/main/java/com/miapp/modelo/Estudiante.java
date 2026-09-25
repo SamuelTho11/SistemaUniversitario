@@ -16,7 +16,6 @@ public final class Estudiante extends Persona {
     // ── Atributos de instancia ────────────────────────────────────────────────
     private String carrera;
     private double promedio;
-    private List<Curso> cursos;
 
     // ── Constructor ───────────────────────────────────────────────────────────
 
