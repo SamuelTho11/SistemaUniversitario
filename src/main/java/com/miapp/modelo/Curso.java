@@ -15,6 +15,7 @@ public class Curso {
     private String codigo;
     private int creditos;
     private List<Estudiante> estudiantes;
+    private Profesor profesorAsignado;
 
     public Curso(String codigo, int creditos) {
         this.codigo = codigo;
@@ -46,8 +47,18 @@ public class Curso {
         this.estudiantes = estudiantes;
     }
 
+    public Profesor getProfesorAsignado() {
+        return profesorAsignado;
+    }
+
+    public void setProfesorAsignado(Profesor profesorAsignado) {
+        this.profesorAsignado = profesorAsignado;
+    }
+
     @Override
     public String toString() {
-        return "Curso{" + "codigo=" + codigo + ", creditos=" + creditos + ", estudiantes=" + estudiantes + '}';
+        return "Curso{" + "codigo=" + codigo + ", creditos=" + creditos + ", estudiantes=" + estudiantes + ", profesorAsignado=" + profesorAsignado + '}';
     }
+
+    
 }

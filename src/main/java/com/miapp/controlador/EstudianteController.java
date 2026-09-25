@@ -44,6 +44,7 @@ public class EstudianteController implements IBuscador {
     public void cargarDatos() {
         inicializarEstudiantes();
         inicializarCursos();
+        inicializarProfesores();
     }
 
     @Override
@@ -102,9 +103,16 @@ public class EstudianteController implements IBuscador {
         System.out.println("Total de estudiantes cargados: " + Estudiante.getTotalEstudiantes());
     }
     private void inicializarCursos(){
+        cursos.clear();
         cursos.add(new Curso("BDA150", 3));
         cursos.add(new Curso("JDB102", 4));
         cursos.add(new Curso("ARS828", 2));
+    }
+    
+    private void inicializarProfesores(){
+        profesores.clear();
+        profesores.add(new Profesor(3200000.0, "Joseph","Saavedra",4));
+        profesores.add(new Profesor(4000000.0,"Alexander","Rodriguez",6));
     }
     
     // --- Metodos para la gestion de cursos ---------------
@@ -121,7 +129,71 @@ public class EstudianteController implements IBuscador {
          return null;
      }
 
-  
+    // --- Metodos para la gestion de profesores -----------
+     public List<Profesor> getProfesores() {
+        return profesores;
+    }
+     
+     public boolean agregarProfesor(String nombreCompleto, double salarioBase){
+         if(nombreCompleto==null || nombreCompleto.trim().isEmpty()){
+             vista.mostrarError("El nombre del Profesor no puede estar vacio.");
+             return false;
+         }
+         int idNuevo = profesores.size()+1;
+         String[] partes = nombreCompleto.trim().split(" ", 2);
+         String nombre  = partes[0];
+         String apellido = (partes.length > 1) ? partes[1] : "";
+         
+         Profesor nuevoProfesor = new Profesor(salarioBase, nombre, apellido, idNuevo);
+         profesores.add(nuevoProfesor);
+         return true;
+     }
+     
+     public void asignarProfesorACurso(String nombreProfesor, String codigoCurso){
+         Profesor prof = encontrarProfesorPorNombre(nombreProfesor);
+         Curso curso = obtenerCursoPorCodigo(codigoCurso);
+         if(prof != null && curso!=null){
+             curso.setProfesorAsignado(prof);
+             vista.mostrarMensaje("Profesor "+ prof.getNombre()+" "+prof.getApellido()+" asignado al curso "+curso.getCodigo()+".");
+         } else{
+             vista.mostrarError("No se pudo realizar el proceso, revise los datos.");
+         }
+     }
+     
+     public void buscarCursoPorProfesor(String nombreProfesor){
+         Profesor prof= encontrarProfesorPorNombre(nombreProfesor);
+         if(prof!=null){
+             StringBuilder cursosAsignados = new StringBuilder();
+             for(Curso c : cursos){
+                 if(c.getProfesorAsignado()!=null && c.getProfesorAsignado().equals(prof)){
+                     cursosAsignados.append("- ").append(c.getCodigo()).append(" (").append(c.getCreditos()).append(" creditos)\n");
+                 }
+             }
+             if (cursosAsignados.length() > 0) {
+                vista.mostrarMensaje("Cursos asignados a " + prof.getNombre() + " " + prof.getApellido() + ":\n" + cursosAsignados.toString());
+             } else {
+                vista.mostrarMensaje("El profesor " + prof.getNombre() + " " + prof.getApellido() + " no tiene cursos asignados.");
+            }
+        } else {
+            vista.mostrarError("Profesor no encontrado.");
+        }
+     }
+     public Profesor obtenerProfesorDeCurso(String codigoCurso) {
+        Curso c = obtenerCursoPorCodigo(codigoCurso);
+        return (c != null) ? c.getProfesorAsignado() : null;
+    }
+     
+     private Profesor encontrarProfesorPorNombre(String nombreCompleto){
+         if(nombreCompleto==null) return null;
+         for(Profesor p: profesores){
+             String completo = (p.getNombre()+ " "+ p.getApellido()).trim();
+             if(completo.equalsIgnoreCase(nombreCompleto.trim()) || p.getNombre().equalsIgnoreCase(nombreCompleto.trim())){
+                 return p;
+             }
+         }
+         return null;
+     }
+     
     // ── Lógica de búsqueda ────────────────────────────────────────────────────
     private void buscarPorCriterio(String criterio) {
 

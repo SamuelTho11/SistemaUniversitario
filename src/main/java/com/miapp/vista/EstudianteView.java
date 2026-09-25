@@ -41,6 +41,13 @@ public class EstudianteView extends JFrame {
     private static final String LABEL_CURSO = "Curso:";
     private static final String BOTON_ESTUDIANTES_CURSO ="Ver estudiantes del curso";
     private static final String BOTON_INSCRIBIR_CURSO = "Inscribir en curso";
+    private static final String TITULO_PANEL_PROFESOR = "Profesores: agregar y asignar a curso";
+    private static final String LABEL_SALARIOBASE = "Salario base:";
+    private static final String BOTON_AGREGAR_PROFESOR = "Agregar Profesor";
+    private static final String LABEL_PROFESOR = "Profesor:";
+    private static final String BOTON_CURSOS_PROFESOR = "Ver cursos del profesor";
+    private static final String LABEL_CURSO_ASIGNAR = "Curso a asignar:";
+    private static final String BOTON_ASIGNAR_CURSO = "Asignar a curso";
 
     // ── Constantes finales para colores ────────────────────────────────────────
     private static final Color COLOR_BOTON_FONDO = new Color(59, 139, 212);
@@ -52,6 +59,7 @@ public class EstudianteView extends JFrame {
     
     private static final Color COLOR_BOTON_ESTUDIANTES_CURSO = new Color(0,153,123);
     private static final Color COLOR_BOTON_INSCRIBIR_CURSO = new Color(255,189,23);
+    private static final Color COLOR_BOTON_AGREGAR_PROFESOR = new Color(46,24,186);
 
     // ── Columnas de la tabla (constante final) ─────────────────────────────────
     private static final String[] COLUMNAS_TABLA = {"ID", "Nombre", "Apellido", "Carrera", "Promedio", "Estado"};
@@ -77,6 +85,15 @@ public class EstudianteView extends JFrame {
     private JButton btnVerEstudiantesCurso;
     private JButton btnInscribirCurso;
     private JComboBox<String> cmbCurso;
+    
+    // ---- Componentes UI - Profesores: agregar y asignar a curso
+    private JTextField txtNombreProfesor;
+    private JSpinner spinSalarioBase;
+    private JButton btnAgregarProfesor;
+    private JComboBox<String> cmbProfesor;
+    private JButton btnCursosProfesor;
+    private JComboBox<String> cmbCursoAsignar;
+    private JButton btnAsignarCurso;
 
     // ── Componentes UI - Resultados y Estado ────────────────────────────────────
     private JTable                 tblResultados;
@@ -203,13 +220,52 @@ public class EstudianteView extends JFrame {
         panelCurso.add(btnVerEstudiantesCurso);
         panelCurso.add(btnInscribirCurso);
         panelCurso.add(lblAvisoCurso);
+        
+        // Panel para agregar y asignar curso a un profesor
+        JPanel panelProfesor = new JPanel(new FlowLayout(FlowLayout.LEFT,10,5));
+        panelProfesor.setBorder(BorderFactory.createTitledBorder(TITULO_PANEL_PROFESOR));
+        
+        JLabel lblNombreProfesor = new JLabel(LABEL_NOMBRE);
+        txtNombreProfesor = new JTextField(ANCHO_CAMPO_AGREGAR);
+        JLabel lblSalarioBase = new JLabel(LABEL_SALARIOBASE);
+        spinSalarioBase = new JSpinner(new SpinnerNumberModel(3000000.0, 3000000.0, 5000000.0, 500.0));
+        spinSalarioBase.setPreferredSize(new Dimension(90, 25));
+        btnAgregarProfesor = new JButton(BOTON_AGREGAR_PROFESOR);
+        btnAgregarProfesor.setBackground(COLOR_BOTON_AGREGAR_PROFESOR);
+        btnAgregarProfesor.setForeground(COLOR_BOTON_TEXTO);
+        btnAgregarProfesor.setFocusPainted(false);
+        JLabel lblProfesor = new JLabel(LABEL_PROFESOR);
+        cmbProfesor = new JComboBox<>();
+        btnCursosProfesor = new JButton(BOTON_CURSOS_PROFESOR);
+        btnCursosProfesor.setBackground(COLOR_BOTON_ESTUDIANTES_CURSO);
+        btnCursosProfesor.setForeground(COLOR_BOTON_TEXTO);
+        btnCursosProfesor.setFocusPainted(false);
+        JLabel lblCursoAsignar = new JLabel(LABEL_CURSO_ASIGNAR);
+        cmbCursoAsignar = new JComboBox<>();
+        btnAsignarCurso = new JButton(BOTON_ASIGNAR_CURSO);
+        btnAsignarCurso.setBackground(COLOR_BOTON_AGREGAR_PROFESOR);
+        btnAsignarCurso.setForeground(COLOR_BOTON_TEXTO);
+        btnAsignarCurso.setFocusPainted(false);
+        
+        panelProfesor.add(lblNombreProfesor);
+        panelProfesor.add(txtNombreProfesor);
+        panelProfesor.add(lblSalarioBase);
+        panelProfesor.add(spinSalarioBase);
+        panelProfesor.add(btnAgregarProfesor);
+        panelProfesor.add(lblProfesor);
+        panelProfesor.add(cmbProfesor);
+        panelProfesor.add(btnCursosProfesor);
+        panelProfesor.add(lblCursoAsignar);
+        panelProfesor.add(cmbCursoAsignar);
+        panelProfesor.add(btnAsignarCurso);
 
-        // Panel superior con GridLayout (4 filas, 1 columna)
-        JPanel panelSuperior = new JPanel(new GridLayout(4, 1, 5, 5));
+        // Panel superior con GridLayout (5 filas, 1 columna)
+        JPanel panelSuperior = new JPanel(new GridLayout(5, 1, 5, 5));
         panelSuperior.add(panelBusqueda);
         panelSuperior.add(panelCarrera);
         panelSuperior.add(panelAgregar);
         panelSuperior.add(panelCurso);
+        panelSuperior.add(panelProfesor);
 
         // ────────────────────────────────────────────────────────────────────────
         // PANEL CENTRAL: Tabla de resultados
@@ -289,6 +345,33 @@ public class EstudianteView extends JFrame {
             if(listaCursos != null){
                 for(com.miapp.modelo.Curso curso : listaCursos){
                     cmbCurso.addItem(curso.getCodigo());
+                }
+            }
+        }
+    }
+    //Cargar los profesores registrados
+    private void cargarProfesores(){
+        if(controlador!=null &&cmbProfesor!=null){
+            cmbProfesor.removeAllItems();
+            cmbProfesor.addItem(OPCION_SELECCIONAR);
+            
+            List<com.miapp.modelo.Profesor> listaProfesores = controlador.getProfesores();
+            if(listaProfesores!=null){
+                for(com.miapp.modelo.Profesor p : listaProfesores){
+                    cmbProfesor.addItem(p.getNombre());
+                }
+            }
+        }
+    }
+    private void cargarCursosAsignar(){
+        if(controlador!=null && cmbCursoAsignar!=null){
+            cmbCursoAsignar.removeAllItems();
+            cmbCursoAsignar.addItem(OPCION_SELECCIONAR);
+            
+            List<com.miapp.modelo.Curso> listaCursos = controlador.getCursos();
+            if(listaCursos!=null){
+                for(com.miapp.modelo.Curso curso : listaCursos){
+                    cmbCursoAsignar.addItem(curso.getCodigo());
                 }
             }
         }
@@ -373,6 +456,50 @@ public class EstudianteView extends JFrame {
                 }
             }
         });
+        //Evento: Agregar profesor
+        btnAgregarProfesor.addActionListener((ActionEvent e) -> {
+            if(controlador!=null){
+                String nombre = txtNombreProfesor.getText().trim();
+                double salarioBase = (double) spinSalarioBase.getValue();
+                if(nombre.isEmpty()){
+                    mostrarError("Ingrese un nombre valido para profesor.");
+                    return;
+                }
+                if(controlador.agregarProfesor(nombre, salarioBase)){
+                    txtNombreProfesor.setText("");
+                    spinSalarioBase.setValue(3000000.0);
+                    cargarProfesores();
+                    mostrarMensaje("Profesor agregado exitosamente.");
+                }
+            }
+        });
+        btnAsignarCurso.addActionListener((ActionEvent e) -> {
+            if (controlador != null) {
+                String profesorSeleccionado = (String) cmbProfesor.getSelectedItem();
+                String cursoSeleccionado = (String) cmbCursoAsignar.getSelectedItem();
+
+            if (profesorSeleccionado == null || profesorSeleccionado.equals(OPCION_SELECCIONAR)) {
+                mostrarError("Seleccione un profesor de la lista.");
+                return;
+             }
+
+            if (cursoSeleccionado == null || cursoSeleccionado.equals(OPCION_SELECCIONAR)) {
+                mostrarError("Seleccione un curso para asignar.");
+                return;
+            }
+                controlador.asignarProfesorACurso(profesorSeleccionado, cursoSeleccionado);
+            }
+        });
+        btnCursosProfesor.addActionListener((ActionEvent e) -> {
+            if (controlador != null) {
+                String profesorSeleccionado = (String) cmbProfesor.getSelectedItem();
+            if (profesorSeleccionado != null && !profesorSeleccionado.equals(OPCION_SELECCIONAR)) {
+                controlador.buscarCursoPorProfesor(profesorSeleccionado);
+             } else {
+                mostrarError("Seleccione un profesor de la lista.");
+                }
+            }
+        });
     }
 
     public void mostrarEstudiante(Object[] fila) {
@@ -422,6 +549,8 @@ public class EstudianteView extends JFrame {
         cargarCarreras();
         cargarCarrerasAgregar();
         cargarCursos();
+        cargarProfesores();
+        cargarCursosAsignar();
         actualizarTotalEstudiantes();
     }
 
