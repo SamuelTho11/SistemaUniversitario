@@ -4,24 +4,29 @@
  */
 package com.miapp.modelo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Samuel
  */
 public class Curso {
-    private int codigo;
+    private String codigo;
     private int creditos;
+    private List<Estudiante> estudiantes;
 
-    public Curso(int codigo, int creditos) {
+    public Curso(String codigo, int creditos) {
         this.codigo = codigo;
         this.creditos = creditos;
+        this.estudiantes = new ArrayList<>();
     }
 
-    public int getCodigo() {
+    public String getCodigo() {
         return codigo;
     }
 
-    public void setCodigo(int codigo) {
+    public void setCodigo(String codigo) {
         this.codigo = codigo;
     }
 
@@ -33,8 +38,16 @@ public class Curso {
         this.creditos = creditos;
     }
 
+    public List<Estudiante> getEstudiantes() {
+        return estudiantes;
+    }
+
+    public void setEstudiantes(List<Estudiante> estudiantes) {
+        this.estudiantes = estudiantes;
+    }
+
     @Override
     public String toString() {
-        return "Curso{" + "codigo=" + codigo + ", creditos=" + creditos + '}';
+        return "Curso{" + "codigo=" + codigo + ", creditos=" + creditos + ", estudiantes=" + estudiantes + '}';
     }
 }

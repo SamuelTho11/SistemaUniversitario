@@ -12,7 +12,7 @@ package com.miapp.servicios;
 public interface IBuscador {
     void buscarEstudiante(String criterio);
     void buscarEstudiantePorCarrera(String carrera);
-    void cargarDatos();
     void buscarEstudiantePorCurso(String codigoCurso);
     void buscarEstudiantePorEstado(String estadoMatricula);
+    void cargarDatos();
 }

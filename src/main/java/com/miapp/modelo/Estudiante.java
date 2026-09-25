@@ -1,11 +1,13 @@
 package com.miapp.modelo;
 
+import com.miapp.servicios.Inscribible;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Modelo: representa la entidad Estudiante.
  */
-public final class Estudiante extends Persona {  
+public final class Estudiante extends Persona implements Inscribible {  
 
     private static int totalEstudiantes = 0;
     public static final int PROMEDIO_MINIMO = 0;
@@ -16,12 +18,14 @@ public final class Estudiante extends Persona {
     // ── Atributos de instancia ────────────────────────────────────────────────
     private String carrera;
     private double promedio;
+    private List<Curso> cursos;
 
     // ── Constructor ───────────────────────────────────────────────────────────
 
     public Estudiante(int id, String nombre, String apellido, String carrera, double promedio) {
         super(nombre, apellido, id);
         this.carrera  = carrera;
+        this.cursos = new ArrayList<>();
    
         if (promedio >= PROMEDIO_MINIMO && promedio <= PROMEDIO_MAXIMO) {
             this.promedio = promedio;
@@ -62,6 +66,10 @@ public final class Estudiante extends Persona {
         return promedio; 
     }
 
+    public List<Curso> getCursos() {
+        return cursos;
+    }
+
     // ── Setters ──────────────────────────────────────────────────────────────
 
     public void setId(int id) { 
@@ -94,5 +102,15 @@ public final class Estudiante extends Persona {
     @Override
     public double calcularPago() {
         return 0;
+    }
+
+    @Override
+    public boolean inscribir(Curso curso) {
+        if(cursos.size() < MAX_MATERIAS && !cursos.contains(curso)){
+            cursos.add(curso);
+            curso.getEstudiantes().add(this);
+            return true;
+        }
+        return false;
     }
 }

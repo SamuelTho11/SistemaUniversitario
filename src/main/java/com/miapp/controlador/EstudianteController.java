@@ -30,6 +30,8 @@ public class EstudianteController implements IBuscador {
 
     public EstudianteController(EstudianteView vista) {
         this.vista = vista;
+        this.profesores = new ArrayList<>();
+        this.cursos = new ArrayList<>();
         // Primero cargar datos (inicializar estudiantes[])
         cargarDatos();
         // Luego asignar controlador a la vista (ahora es seguro acceder a estudiantes[])
@@ -41,6 +43,7 @@ public class EstudianteController implements IBuscador {
     @Override
     public void cargarDatos() {
         inicializarEstudiantes();
+        inicializarCursos();
     }
 
     @Override
@@ -52,7 +55,28 @@ public class EstudianteController implements IBuscador {
     public void buscarEstudiantePorCarrera(String carrera) {
         buscarPorCarrera(carrera);
     }
+    
+    @Override
+    public void buscarEstudiantePorCurso(String codigoCurso) {
+        if(codigoCurso == null || codigoCurso.trim().isEmpty() || codigoCurso.equals("Seleccionar")){
+            vista.mostrarError("Por favor seleccione un curso valido.");
+            return;
+        }
+        Curso cursoEncontrado = obtenerCursoPorCodigo(codigoCurso);
+        if(cursoEncontrado != null){
+            List<Estudiante> inscritos  = cursoEncontrado.getEstudiantes();
+            if(inscritos.isEmpty()){
+                vista.mostrarMensaje("No hay estudiantes inscritos en el curso "+ codigoCurso);
+                vista.mostrarEstudiantes(new ArrayList<>());
+            } else {
+                vista.mostrarEstudiantes(convertirAFilas(inscritos));
+            }
+        }
+    }
 
+    @Override
+    public void buscarEstudiantePorEstado(String estadoMatricula) {
+    }
     // ── Carga de datos iniciales ──────────────────────────────────────────────
 
     private void inicializarEstudiantes() {
@@ -77,10 +101,28 @@ public class EstudianteController implements IBuscador {
         // Log: informa cuántos estudiantes se cargaron usando static getTotalEstudiantes()
         System.out.println("Total de estudiantes cargados: " + Estudiante.getTotalEstudiantes());
     }
-
-    // ── Lógica de búsqueda ────────────────────────────────────────────────────
+    private void inicializarCursos(){
+        cursos.add(new Curso("BDA150", 3));
+        cursos.add(new Curso("JDB102", 4));
+        cursos.add(new Curso("ARS828", 2));
+    }
+    
+    // --- Metodos para la gestion de cursos ---------------
+     public List<Curso> getCursos() {
+        return cursos;
+    }
+     
+     public Curso obtenerCursoPorCodigo(String codigo){
+         for(Curso c : cursos){
+             if(c.getCodigo().equalsIgnoreCase(codigo)){
+                 return c;
+             }
+         }
+         return null;
+     }
 
   
+    // ── Lógica de búsqueda ────────────────────────────────────────────────────
     private void buscarPorCriterio(String criterio) {
 
         // Validación básica usando constante final
@@ -152,16 +194,18 @@ public class EstudianteController implements IBuscador {
         }
         return filas;
     }
-
-    public Estudiante obtenerEstudiantePorId(int id) {
-        for (Estudiante e : estudiantes) {
-            if (e.getId() == id) {
-                return e;
+    
+    public Estudiante buscarEstudiantePorId(int id) {
+        if(this.estudiantes != null){
+            for(Estudiante e: estudiantes){
+                if(e!=null && e.getId() == id){
+                    return e;
+                }
             }
         }
         return null;
     }
-
+    
     public String[] obtenerCarrerasUnicas() {
         List<String> carreras = new ArrayList<>();
         for (Estudiante e : estudiantes) {
@@ -215,4 +259,27 @@ public class EstudianteController implements IBuscador {
         return true;
     }
 
+    public void inscribirEstudianteEnCurso(int idEstudiante, String codigoCurso) {
+        if(codigoCurso==null || codigoCurso.trim().isEmpty() || codigoCurso.equals("Seleccionar...")){
+            vista.mostrarError("Debe seleccionar un curso valido");
+            return;
+        }
+        Estudiante estudianteEncontrado = buscarEstudiantePorId(idEstudiante);
+        if(estudianteEncontrado==null){
+            vista.mostrarError("No se encontró al estudiante seleccionado");
+            return;
+        }
+        Curso cursoEncontrado = obtenerCursoPorCodigo(codigoCurso);
+        if(cursoEncontrado==null){
+            vista.mostrarError("No se encontró el curso con codigo: "+codigoCurso);
+            return;
+        }
+        boolean encontrado = estudianteEncontrado.inscribir(cursoEncontrado);
+        if(encontrado){
+            vista.mostrarMensaje("Estudiante " + estudianteEncontrado.getNombre()+" "+ estudianteEncontrado.getApellido() + " inscrito en el curso "+ codigoCurso+".") ;
+            System.out.println("Inscritos en " + cursoEncontrado.getCodigo() + ": " + cursoEncontrado.getEstudiantes().size());
+        } else{
+            vista.mostrarError("El estudiante ya se encuentra inscrito en este curso o superó el maximo de materias.");
+        }
+    }
 }

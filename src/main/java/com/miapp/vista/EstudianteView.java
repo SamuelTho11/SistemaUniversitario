@@ -34,8 +34,13 @@ public class EstudianteView extends JFrame {
     private static final String OPCION_SELECCIONAR = "Seleccionar...";
     private static final String MENSAJE_INICIAL = "Ingrese un nombre o seleccione una carrera y presione Buscar.";
     private static final String MENSAJE_ENCONTRADO_UNO = "Se encontró 1 estudiante.";
-    private static final String MENSAJE_ENCONTRADOS_VARIOS = "Se encontraron {0} estudiante(s).";
+    private static final String MENSAJE_ENCONTRADOS_VARIOS = "Se encontraron %d estudiante(s).";
     private static final String MENSAJE_SIN_RESULTADOS = "No se encontraron estudiantes con ese criterio.";
+    
+    private static final String TITULO_PANEL_CURSO = "Cursos: inscripción y consulta";
+    private static final String LABEL_CURSO = "Curso:";
+    private static final String BOTON_ESTUDIANTES_CURSO ="Ver estudiantes del curso";
+    private static final String BOTON_INSCRIBIR_CURSO = "Inscribir en curso";
 
     // ── Constantes finales para colores ────────────────────────────────────────
     private static final Color COLOR_BOTON_FONDO = new Color(59, 139, 212);
@@ -44,9 +49,12 @@ public class EstudianteView extends JFrame {
     private static final Color COLOR_BOTON_AGREGAR = new Color(103, 58, 183);
     private static final Color COLOR_BOTON_TEXTO = Color.WHITE;
     private static final Color COLOR_ESTADO_TEXTO = Color.GRAY;
+    
+    private static final Color COLOR_BOTON_ESTUDIANTES_CURSO = new Color(0,153,123);
+    private static final Color COLOR_BOTON_INSCRIBIR_CURSO = new Color(255,189,23);
 
     // ── Columnas de la tabla (constante final) ─────────────────────────────────
-    private static final String[] COLUMNAS_TABLA = {"ID", "Nombre", "Apellido", "Carrera", "Promedio"};
+    private static final String[] COLUMNAS_TABLA = {"ID", "Nombre", "Apellido", "Carrera", "Promedio", "Estado"};
     private static final int INDICE_PROMEDIO = 4;
 
     // ── Componentes UI - Búsqueda por nombre ────────────────────────────────────
@@ -64,6 +72,11 @@ public class EstudianteView extends JFrame {
     private JComboBox<String>      cmbAgregarCarrera;
     private JSpinner               spinPromedio;
     private JButton                btnAgregar;
+    
+    // ---- Componentes UI - Cursos: Inscripcion y consulta
+    private JButton btnVerEstudiantesCurso;
+    private JButton btnInscribirCurso;
+    private JComboBox<String> cmbCurso;
 
     // ── Componentes UI - Resultados y Estado ────────────────────────────────────
     private JTable                 tblResultados;
@@ -167,12 +180,36 @@ public class EstudianteView extends JFrame {
         panelAgregar.add(lblAgregarPromedio);
         panelAgregar.add(spinPromedio);
         panelAgregar.add(btnAgregar);
+        
+        // Panel para inscribir y consultar cursos
+        JPanel panelCurso = new JPanel(new FlowLayout(FlowLayout.LEFT,10,5));
+        panelCurso.setBorder(BorderFactory.createTitledBorder(TITULO_PANEL_CURSO));
+        
+        JLabel lblCurso = new JLabel(LABEL_CURSO);
+        cmbCurso = new JComboBox<>();
+        btnVerEstudiantesCurso = new JButton(BOTON_ESTUDIANTES_CURSO);
+        btnVerEstudiantesCurso.setBackground(COLOR_BOTON_ESTUDIANTES_CURSO);
+        btnVerEstudiantesCurso.setForeground(COLOR_BOTON_TEXTO);
+        btnVerEstudiantesCurso.setFocusPainted(false);
+        btnInscribirCurso = new JButton(BOTON_INSCRIBIR_CURSO);
+        btnInscribirCurso.setBackground(COLOR_BOTON_INSCRIBIR_CURSO);
+        btnInscribirCurso.setForeground(COLOR_BOTON_TEXTO);
+        btnInscribirCurso.setFocusPainted(false);
+        JLabel lblAvisoCurso = new JLabel("(primero busque y seleccione un estudiante en la tabla)");
+        lblAvisoCurso.setForeground(COLOR_ESTADO_TEXTO);
+        
+        panelCurso.add(lblCurso);
+        panelCurso.add(cmbCurso);
+        panelCurso.add(btnVerEstudiantesCurso);
+        panelCurso.add(btnInscribirCurso);
+        panelCurso.add(lblAvisoCurso);
 
-        // Panel superior con GridLayout (3 filas, 1 columna)
-        JPanel panelSuperior = new JPanel(new GridLayout(3, 1, 5, 5));
+        // Panel superior con GridLayout (4 filas, 1 columna)
+        JPanel panelSuperior = new JPanel(new GridLayout(4, 1, 5, 5));
         panelSuperior.add(panelBusqueda);
         panelSuperior.add(panelCarrera);
         panelSuperior.add(panelAgregar);
+        panelSuperior.add(panelCurso);
 
         // ────────────────────────────────────────────────────────────────────────
         // PANEL CENTRAL: Tabla de resultados
@@ -242,6 +279,20 @@ public class EstudianteView extends JFrame {
             }
         }
     }
+    //Cargar los cursos disponibles desde el controlador al combo de busqueda
+    private void cargarCursos(){
+        if(controlador!=null && cmbCurso != null){
+            cmbCurso.removeAllItems();
+            cmbCurso.addItem(OPCION_SELECCIONAR);
+            
+            List<com.miapp.modelo.Curso> listaCursos = controlador.getCursos();
+            if(listaCursos != null){
+                for(com.miapp.modelo.Curso curso : listaCursos){
+                    cmbCurso.addItem(curso.getCodigo());
+                }
+            }
+        }
+    }
 
     // ── Eventos ───────────────────────────────────────────────────────────────
 
@@ -267,6 +318,35 @@ public class EstudianteView extends JFrame {
                 } else {
                     mostrarError("Seleccione una carrera válida.");
                 }
+            }
+        });
+        
+        //Evento: Ver estudiantes del curso
+        btnVerEstudiantesCurso.addActionListener((ActionEvent e) ->{
+            if(controlador!=null){
+                String cursoSeleccionado = (String) cmbCurso.getSelectedItem();
+                if(cursoSeleccionado != null && !cursoSeleccionado.equals(OPCION_SELECCIONAR)){
+                    controlador.buscarEstudiantePorCurso(cursoSeleccionado);
+                } else {
+                    mostrarError("Seleccione un curso valido de la lista.");
+                }
+            }
+        });
+        
+        btnInscribirCurso.addActionListener((ActionEvent e) ->{
+            if(controlador!=null){
+                int filaSeleccionada = tblResultados.getSelectedRow();
+                String cursoSeleccionado = (String) cmbCurso.getSelectedItem();
+                if(filaSeleccionada == -1){
+                    mostrarError("Seleccione un estudiante de la tabla");
+                    return;
+                }
+                if(cursoSeleccionado == null || cursoSeleccionado.equals(OPCION_SELECCIONAR)){
+                    mostrarError("Debe seleccionar un curso valido.");
+                    return;
+                }
+                int idEstudiante = (int) tblResultados.getValueAt(filaSeleccionada, 0);
+                controlador.inscribirEstudianteEnCurso(idEstudiante, cursoSeleccionado);
             }
         });
 
@@ -341,6 +421,7 @@ public class EstudianteView extends JFrame {
         this.controlador = controlador;
         cargarCarreras();
         cargarCarrerasAgregar();
+        cargarCursos();
         actualizarTotalEstudiantes();
     }
 
