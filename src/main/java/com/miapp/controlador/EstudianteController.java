@@ -4,6 +4,7 @@ import com.miapp.modelo.Estudiante;
 import com.miapp.modelo.Curso;
 import com.miapp.modelo.Profesor;
 import com.miapp.servicios.IBuscador;
+import com.miapp.utilidades.EstadoMatricula;
 import com.miapp.vista.EstudianteView;
 
 import java.util.ArrayList;
@@ -77,6 +78,24 @@ public class EstudianteController implements IBuscador {
 
     @Override
     public void buscarEstudiantePorEstado(String estadoMatricula) {
+        if(estadoMatricula == null || estadoMatricula.trim().isEmpty() || estadoMatricula.equals("Seleccionar...")){
+            vista.mostrarError("Por favor seleccione un estado de matricula valido.");
+            return;
+        }
+        List<Estudiante> resultados = new ArrayList<>();
+        for(Estudiante e : estudiantes){
+            if(e!=null && e.getEstadoMatricula() != null){
+                if(e.getEstadoMatricula().name().equalsIgnoreCase(estadoMatricula.trim())){
+                    resultados.add(e);
+                }
+            }
+        }
+        if(resultados.isEmpty()){
+            vista.mostrarMensaje("No se encontraron estudiantes con el estado: "+estadoMatricula);
+            vista.mostrarEstudiantes(new ArrayList<>());
+        } else{
+            vista.mostrarEstudiantes(convertirAFilas(resultados));
+        }
     }
     // ── Carga de datos iniciales ──────────────────────────────────────────────
 
@@ -254,7 +273,8 @@ public class EstudianteController implements IBuscador {
             e.getNombre(),
             e.getApellido(),
             e.getCarrera(),
-            String.format("%.2f", e.getPromedio())
+            String.format("%.2f", e.getPromedio()),
+            e.getEstadoMatricula()
         };
     }
 
@@ -352,6 +372,20 @@ public class EstudianteController implements IBuscador {
             System.out.println("Inscritos en " + cursoEncontrado.getCodigo() + ": " + cursoEncontrado.getEstudiantes().size());
         } else{
             vista.mostrarError("El estudiante ya se encuentra inscrito en este curso o superó el maximo de materias.");
+        }
+    }
+
+    public void cambiarEstadoMatricula(int idEstudiante, EstadoMatricula nuevoEstado) {
+        if(nuevoEstado==null){
+            vista.mostrarError("Seleccione un estado de matricula valido.");
+            return;
+        }
+        Estudiante e = buscarEstudiantePorId(idEstudiante);
+        if(e!=null){
+            e.setEstadoMatricula(nuevoEstado);
+            vista.mostrarMensaje("Estado de matricula actualizado a: "+nuevoEstado+" para "+e.getNombre()+" "+e.getApellido());
+        } else{
+            vista.mostrarError("No se encontró el estudiante con ID: "+idEstudiante);
         }
     }
 }

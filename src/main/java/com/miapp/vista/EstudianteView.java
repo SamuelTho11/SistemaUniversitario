@@ -1,6 +1,7 @@
 package com.miapp.vista;
 
 import com.miapp.controlador.EstudianteController;
+import com.miapp.utilidades.EstadoMatricula;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -48,6 +49,10 @@ public class EstudianteView extends JFrame {
     private static final String BOTON_CURSOS_PROFESOR = "Ver cursos del profesor";
     private static final String LABEL_CURSO_ASIGNAR = "Curso a asignar:";
     private static final String BOTON_ASIGNAR_CURSO = "Asignar a curso";
+    private static final String TITULO_ESTADO_MATRICULA = "Estado de matricula: buscar y cambiar";
+    private static final String LABEL_ESTADO = "Nuevo estado:";
+    private static final String BOTON_BUSCAR_ESTADO = "Buscar por estado";
+    private static final String BOTON_CAMBIAR_ESTADO = "Cambiar estado";
 
     // ── Constantes finales para colores ────────────────────────────────────────
     private static final Color COLOR_BOTON_FONDO = new Color(59, 139, 212);
@@ -94,6 +99,11 @@ public class EstudianteView extends JFrame {
     private JButton btnCursosProfesor;
     private JComboBox<String> cmbCursoAsignar;
     private JButton btnAsignarCurso;
+    
+    // ---- Componenetes UI - Estado de matricula: buscar y cambiar
+    private JComboBox<String> cmbNuevoEstado;
+    private JButton btnBuscarEstado;
+    private JButton btnCambiarEstado;
 
     // ── Componentes UI - Resultados y Estado ────────────────────────────────────
     private JTable                 tblResultados;
@@ -258,14 +268,35 @@ public class EstudianteView extends JFrame {
         panelProfesor.add(lblCursoAsignar);
         panelProfesor.add(cmbCursoAsignar);
         panelProfesor.add(btnAsignarCurso);
+        
+        // Panel para ver estado de matricula, buscar y cambiar
+        JPanel panelMatricula = new JPanel(new FlowLayout(FlowLayout.LEFT,10,5));
+        panelMatricula.setBorder(BorderFactory.createTitledBorder(TITULO_ESTADO_MATRICULA));
+        
+        JLabel lblNombreEstado = new JLabel(LABEL_ESTADO);
+        cmbNuevoEstado = new JComboBox<>();
+        btnBuscarEstado = new JButton(BOTON_BUSCAR_ESTADO);
+        btnBuscarEstado.setBackground(COLOR_BOTON_CARRERA);
+        btnBuscarEstado.setForeground(COLOR_BOTON_TEXTO);
+        btnBuscarEstado.setFocusPainted(false);
+        btnCambiarEstado = new JButton(BOTON_CAMBIAR_ESTADO);
+        btnCambiarEstado.setBackground(COLOR_BOTON_ESTUDIANTES_CURSO);
+        btnCambiarEstado.setForeground(COLOR_BOTON_TEXTO);
+        btnCambiarEstado.setFocusPainted(false);
+        
+        panelMatricula.add(lblNombreEstado);
+        panelMatricula.add(cmbNuevoEstado);
+        panelMatricula.add(btnBuscarEstado);
+        panelMatricula.add(btnCambiarEstado);
 
-        // Panel superior con GridLayout (5 filas, 1 columna)
-        JPanel panelSuperior = new JPanel(new GridLayout(5, 1, 5, 5));
+        // Panel superior con GridLayout (6 filas, 1 columna)
+        JPanel panelSuperior = new JPanel(new GridLayout(6, 1, 5, 5));
         panelSuperior.add(panelBusqueda);
         panelSuperior.add(panelCarrera);
         panelSuperior.add(panelAgregar);
         panelSuperior.add(panelCurso);
         panelSuperior.add(panelProfesor);
+        panelSuperior.add(panelMatricula);
 
         // ────────────────────────────────────────────────────────────────────────
         // PANEL CENTRAL: Tabla de resultados
@@ -373,6 +404,16 @@ public class EstudianteView extends JFrame {
                 for(com.miapp.modelo.Curso curso : listaCursos){
                     cmbCursoAsignar.addItem(curso.getCodigo());
                 }
+            }
+        }
+    }
+    //Cargar estados de matricula
+    private void cargarEstadosMatricula(){
+        if(cmbNuevoEstado!=null){
+            cmbNuevoEstado.removeAllItems();
+            cmbNuevoEstado.addItem(OPCION_SELECCIONAR);
+            for(EstadoMatricula estado : EstadoMatricula.values() ){
+                cmbNuevoEstado.addItem(estado.name());
             }
         }
     }
@@ -500,6 +541,37 @@ public class EstudianteView extends JFrame {
                 }
             }
         });
+        
+        btnBuscarEstado.addActionListener((ActionEvent e) -> {
+            if(controlador!=null){
+                String estadoSeleccionado = (String) cmbNuevoEstado.getSelectedItem();
+                if(estadoSeleccionado!=null && !estadoSeleccionado.equals(OPCION_SELECCIONAR)){
+                    EstadoMatricula estado = EstadoMatricula.valueOf(estadoSeleccionado);
+                    controlador.buscarEstudiantePorEstado(estadoSeleccionado);
+                } else{
+                    mostrarError("Seleccione un estado de matricula valido.");
+                }
+            }
+        });
+        
+        btnCambiarEstado.addActionListener((ActionEvent e) -> {
+            if(controlador!=null){
+                int filaSeleccionada =tblResultados.getSelectedRow();
+                String seleccion =(String) cmbNuevoEstado.getSelectedItem();
+                if(filaSeleccionada==-1){
+                    mostrarError("Selecciona a un estudiante de la tabla");
+                    return;
+                }
+                if(seleccion == null || seleccion.equals(OPCION_SELECCIONAR)){
+                    mostrarError("Seleccione un estado valido.");
+                    return;
+                }
+                int idEstudiante = (int) tblResultados.getValueAt(filaSeleccionada, 0);
+                EstadoMatricula nuevoEstado =  EstadoMatricula.valueOf(seleccion);
+                controlador.cambiarEstadoMatricula(idEstudiante, nuevoEstado);
+            }
+        });
+        
     }
 
     public void mostrarEstudiante(Object[] fila) {
@@ -551,6 +623,7 @@ public class EstudianteView extends JFrame {
         cargarCursos();
         cargarProfesores();
         cargarCursosAsignar();
+        cargarEstadosMatricula();
         actualizarTotalEstudiantes();
     }
 

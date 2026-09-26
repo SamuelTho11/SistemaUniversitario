@@ -1,6 +1,7 @@
 package com.miapp.modelo;
 
 import com.miapp.servicios.Inscribible;
+import com.miapp.utilidades.EstadoMatricula;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,7 @@ public final class Estudiante extends Persona implements Inscribible {
     private String carrera;
     private double promedio;
     private List<Curso> cursos;
+    private EstadoMatricula estadoMatricula;
 
     // ── Constructor ───────────────────────────────────────────────────────────
 
@@ -70,6 +72,10 @@ public final class Estudiante extends Persona implements Inscribible {
         return cursos;
     }
 
+    public EstadoMatricula getEstadoMatricula() {
+        return estadoMatricula;
+    }
+
     // ── Setters ──────────────────────────────────────────────────────────────
 
     public void setId(int id) { 
@@ -78,6 +84,10 @@ public final class Estudiante extends Persona implements Inscribible {
 
     public void setCarrera(String carrera) { 
         this.carrera = carrera; 
+    }
+
+    public void setEstadoMatricula(EstadoMatricula estadoMatricula) {
+        this.estadoMatricula = estadoMatricula;
     }
 
     /**
